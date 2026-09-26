@@ -54,6 +54,11 @@
         transform: translateY(1px);
       }
 
+      button:focus-visible {
+        outline: 3px solid #1e88ff;
+        outline-offset: 3px;
+      }
+
       .result {
         margin-top: 18px;
         min-height: 88px;
@@ -97,13 +102,17 @@
 
       const drawButton = document.getElementById("drawButton");
       const result = document.getElementById("result");
+      const fortuneText = document.createElement("p");
+      const adviceText = document.createElement("p");
+
+      fortuneText.className = "fortune";
+      adviceText.className = "advice";
 
       drawButton.addEventListener("click", () => {
         const pick = fortunes[Math.floor(Math.random() * fortunes.length)];
-        result.innerHTML = `
-          <p class="fortune">${pick.title}</p>
-          <p class="advice">${pick.title}：${pick.advice}</p>
-        `;
+        fortuneText.textContent = pick.title;
+        adviceText.textContent = `${pick.title}：${pick.advice}`;
+        result.replaceChildren(fortuneText, adviceText);
       });
     </script>
   </body>
