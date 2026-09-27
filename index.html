@@ -59,15 +59,110 @@
         outline-offset: 3px;
       }
 
+      button:disabled {
+        opacity: 0.65;
+        cursor: not-allowed;
+      }
+
       .result {
         margin-top: 18px;
-        min-height: 88px;
+        min-height: 170px;
         border-radius: 12px;
         background: #fff8e6;
         padding: 14px;
         color: #333;
         display: grid;
         place-items: center;
+        align-content: center;
+      }
+
+      .omikuji-stage {
+        height: 88px;
+        display: none;
+        place-items: center;
+        margin-bottom: 8px;
+      }
+
+      .result.is-animating .omikuji-stage {
+        display: grid;
+      }
+
+      .omikuji-box {
+        width: 72px;
+        height: 72px;
+        border-radius: 12px;
+        background: linear-gradient(145deg, #da3f3f 0%, #b82424 100%);
+        position: relative;
+      }
+
+      .result.is-animating .omikuji-box {
+        animation: shake 0.42s ease-in-out 3;
+      }
+
+      .omikuji-stick {
+        position: absolute;
+        left: 50%;
+        top: 18px;
+        width: 6px;
+        height: 50px;
+        border-radius: 4px;
+        background: #f3e6c7;
+        transform: translate(-50%, 0);
+      }
+
+      .result.is-animating .omikuji-stick {
+        animation: draw-stick 1.26s ease-out forwards;
+      }
+
+      .hint {
+        margin: 0;
+      }
+
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+
+      @keyframes shake {
+        0%,
+        100% {
+          transform: rotate(0deg);
+        }
+        25% {
+          transform: rotate(-8deg);
+        }
+        75% {
+          transform: rotate(8deg);
+        }
+      }
+
+      @keyframes draw-stick {
+        0%,
+        25% {
+          transform: translate(-50%, 0);
+        }
+        70%,
+        100% {
+          transform: translate(-50%, -40px);
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .result.is-animating .omikuji-stage {
+          display: none;
+        }
+
+        .result.is-animating .omikuji-box,
+        .result.is-animating .omikuji-stick {
+          animation: none;
+        }
       }
 
       .fortune {
@@ -87,8 +182,16 @@
     <main class="card">
       <h1>今日のおみくじ</h1>
       <button id="drawButton" type="button">おみくじを引く</button>
-      <section class="result" id="result" aria-live="polite">
-        <p>ボタンを押して運勢を占ってみましょう。</p>
+      <section class="result" id="result">
+        <div class="omikuji-stage" aria-hidden="true">
+          <div class="omikuji-box">
+            <span class="omikuji-stick"></span>
+          </div>
+        </div>
+        <div id="resultContent">
+          <p class="hint" id="resultHint">ボタンを押して運勢を占ってみましょう。</p>
+        </div>
+        <p class="sr-only" id="resultMessage" aria-live="polite" aria-atomic="true"></p>
       </section>
     </main>
 
@@ -102,18 +205,69 @@
 
       const drawButton = document.getElementById("drawButton");
       const result = document.getElementById("result");
+      const resultContent = document.getElementById("resultContent");
+      const resultHint = document.getElementById("resultHint");
+      const resultMessage = document.getElementById("resultMessage");
+      const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
       const fortuneText = document.createElement("p");
       const adviceText = document.createElement("p");
+      let isAnimating = false;
+      let revealTimerId = null;
+      let announceToggle = false;
+      const clearRevealTimer = () => {
+        if (revealTimerId !== null) {
+          window.clearTimeout(revealTimerId);
+          revealTimerId = null;
+        }
+      };
+      const resetAnimationState = () => {
+        clearRevealTimer();
+        if (isAnimating) {
+          resultHint.textContent = "ボタンを押して運勢を占ってみましょう。";
+          resultContent.replaceChildren(resultHint);
+          resultMessage.textContent = "";
+        }
+        result.classList.remove("is-animating");
+        drawButton.disabled = false;
+        isAnimating = false;
+      };
 
       fortuneText.className = "fortune";
       adviceText.className = "advice";
 
       drawButton.addEventListener("click", () => {
+        if (isAnimating) {
+          return;
+        }
+
+        isAnimating = true;
+        drawButton.disabled = true;
+
         const pick = fortunes[Math.floor(Math.random() * fortunes.length)];
-        fortuneText.textContent = pick.title;
-        adviceText.textContent = `${pick.title}：${pick.advice}`;
-        result.replaceChildren(fortuneText, adviceText);
+        result.classList.add("is-animating");
+        resultHint.textContent = "おみくじを振っています…";
+        resultMessage.textContent = "おみくじを振っています…";
+        resultContent.replaceChildren(resultHint);
+
+        const revealDelay = prefersReducedMotion.matches ? 0 : 1400;
+        clearRevealTimer();
+
+        revealTimerId = window.setTimeout(() => {
+          result.classList.remove("is-animating");
+          const announcement = `結果：${pick.title}。${pick.advice}`;
+          announceToggle = !announceToggle;
+          resultMessage.textContent = `${announcement}${announceToggle ? "\u200b" : ""}`;
+          fortuneText.textContent = pick.title;
+          adviceText.textContent = `${pick.title}：${pick.advice}`;
+          resultContent.replaceChildren(fortuneText, adviceText);
+          drawButton.disabled = false;
+          isAnimating = false;
+          revealTimerId = null;
+        }, revealDelay);
       });
+
+      window.addEventListener("pagehide", resetAnimationState);
+
     </script>
   </body>
 </html>
