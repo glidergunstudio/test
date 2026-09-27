@@ -248,11 +248,6 @@
         }, revealDelay);
       });
 
-      window.addEventListener("beforeunload", () => {
-        if (revealTimerId !== null) {
-          window.clearTimeout(revealTimerId);
-        }
-      });
     </script>
   </body>
 </html>
