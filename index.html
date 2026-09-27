@@ -171,14 +171,14 @@
     <main class="card">
       <h1>今日のおみくじ</h1>
       <button id="drawButton" type="button">おみくじを引く</button>
-      <section class="result" id="result" aria-live="polite">
+      <section class="result" id="result">
         <div class="omikuji-stage" aria-hidden="true">
           <div class="omikuji-box">
             <span class="omikuji-stick"></span>
           </div>
         </div>
         <p class="hint" id="resultHint">ボタンを押して運勢を占ってみましょう。</p>
-        <p class="sr-only" id="resultMessage"></p>
+        <p class="sr-only" id="resultMessage" aria-live="polite" aria-atomic="true"></p>
       </section>
     </main>
 
