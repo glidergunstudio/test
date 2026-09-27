@@ -184,7 +184,9 @@
             <span class="omikuji-stick"></span>
           </div>
         </div>
-        <p class="hint" id="resultHint">ボタンを押して運勢を占ってみましょう。</p>
+        <div id="resultContent">
+          <p class="hint" id="resultHint">ボタンを押して運勢を占ってみましょう。</p>
+        </div>
         <p class="sr-only" id="resultMessage" aria-live="polite" aria-atomic="true"></p>
       </section>
     </main>
@@ -199,6 +201,7 @@
 
       const drawButton = document.getElementById("drawButton");
       const result = document.getElementById("result");
+      const resultContent = document.getElementById("resultContent");
       const resultHint = document.getElementById("resultHint");
       const resultMessage = document.getElementById("resultMessage");
       const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -222,17 +225,15 @@
         result.classList.add("is-animating");
         resultHint.textContent = "おみくじを振っています…";
         resultMessage.textContent = "おみくじを振っています…";
-        fortuneText.remove();
-        adviceText.remove();
+        resultContent.replaceChildren(resultHint);
 
         const revealDelay = prefersReducedMotion.matches ? 0 : 1400;
         window.setTimeout(() => {
           result.classList.remove("is-animating");
-          resultHint.textContent = "";
           resultMessage.textContent = `結果：${pick.title}。${pick.advice}`;
           fortuneText.textContent = pick.title;
           adviceText.textContent = `${pick.title}：${pick.advice}`;
-          result.append(fortuneText, adviceText);
+          resultContent.replaceChildren(fortuneText, adviceText);
           fortuneText.focus({ preventScroll: true });
           drawButton.disabled = false;
           isAnimating = false;
