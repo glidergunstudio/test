@@ -234,7 +234,11 @@
 
         revealTimerId = window.setTimeout(() => {
           result.classList.remove("is-animating");
-          resultMessage.textContent = `結果：${pick.title}。${pick.advice}`;
+          const announcement = `結果：${pick.title}。${pick.advice}`;
+          resultMessage.textContent = "";
+          window.requestAnimationFrame(() => {
+            resultMessage.textContent = announcement;
+          });
           fortuneText.textContent = pick.title;
           adviceText.textContent = `${pick.title}：${pick.advice}`;
           resultContent.replaceChildren(fortuneText, adviceText);
