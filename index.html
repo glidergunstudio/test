@@ -203,7 +203,7 @@
 
         window.setTimeout(() => {
           result.classList.remove("is-animating");
-          resultMessage.textContent = "";
+          resultMessage.textContent = `結果：${pick.title}。${pick.advice}`;
           fortuneText.textContent = pick.title;
           adviceText.textContent = `${pick.title}：${pick.advice}`;
           result.append(fortuneText, adviceText);
