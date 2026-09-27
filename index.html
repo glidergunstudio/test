@@ -220,6 +220,12 @@
           revealTimerId = null;
         }
       };
+      const resetAnimationState = () => {
+        clearRevealTimer();
+        result.classList.remove("is-animating");
+        drawButton.disabled = false;
+        isAnimating = false;
+      };
 
       fortuneText.className = "fortune";
       adviceText.className = "advice";
@@ -255,7 +261,7 @@
         }, revealDelay);
       });
 
-      window.addEventListener("pagehide", clearRevealTimer);
+      window.addEventListener("pagehide", resetAnimationState);
 
     </script>
   </body>
