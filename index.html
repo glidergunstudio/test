@@ -239,7 +239,7 @@
           fortuneText.textContent = pick.title;
           adviceText.textContent = `${pick.title}：${pick.advice}`;
           resultContent.replaceChildren(fortuneText, adviceText);
-          if (prefersReducedMotion.matches && document.activeElement === drawButton) {
+          if (document.activeElement === drawButton) {
             fortuneText.focus({ preventScroll: true });
           }
           drawButton.disabled = false;
