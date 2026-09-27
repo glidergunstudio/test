@@ -154,6 +154,13 @@
         }
       }
 
+      @media (prefers-reduced-motion: reduce) {
+        .result.is-animating .omikuji-box,
+        .result.is-animating .omikuji-stick {
+          animation: none;
+        }
+      }
+
       .fortune {
         font-size: 1.4rem;
         font-weight: 800;
@@ -171,7 +178,7 @@
     <main class="card">
       <h1>今日のおみくじ</h1>
       <button id="drawButton" type="button">おみくじを引く</button>
-      <section class="result" id="result" tabindex="-1" aria-label="おみくじ結果">
+      <section class="result" id="result">
         <div class="omikuji-stage" aria-hidden="true">
           <div class="omikuji-box">
             <span class="omikuji-stick"></span>
@@ -194,12 +201,14 @@
       const result = document.getElementById("result");
       const resultHint = document.getElementById("resultHint");
       const resultMessage = document.getElementById("resultMessage");
+      const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
       const fortuneText = document.createElement("p");
       const adviceText = document.createElement("p");
       let isAnimating = false;
 
       fortuneText.className = "fortune";
       adviceText.className = "advice";
+      fortuneText.setAttribute("tabindex", "-1");
       fortuneText.setAttribute("aria-hidden", "true");
       adviceText.setAttribute("aria-hidden", "true");
 
@@ -218,6 +227,7 @@
         fortuneText.remove();
         adviceText.remove();
 
+        const revealDelay = prefersReducedMotion.matches ? 0 : 1400;
         window.setTimeout(() => {
           result.classList.remove("is-animating");
           resultHint.textContent = "";
@@ -225,10 +235,10 @@
           fortuneText.textContent = pick.title;
           adviceText.textContent = `${pick.title}：${pick.advice}`;
           result.append(fortuneText, adviceText);
-          result.focus({ preventScroll: true });
+          fortuneText.focus({ preventScroll: true });
           drawButton.disabled = false;
           isAnimating = false;
-        }, 1400);
+        }, revealDelay);
       });
     </script>
   </body>
