@@ -222,6 +222,11 @@
       };
       const resetAnimationState = () => {
         clearRevealTimer();
+        if (isAnimating) {
+          resultHint.textContent = "ボタンを押して運勢を占ってみましょう。";
+          resultContent.replaceChildren(resultHint);
+          resultMessage.textContent = "";
+        }
         result.classList.remove("is-animating");
         drawButton.disabled = false;
         isAnimating = false;
