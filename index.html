@@ -208,6 +208,7 @@
       const fortuneText = document.createElement("p");
       const adviceText = document.createElement("p");
       let isAnimating = false;
+      let revealTimerId = null;
 
       fortuneText.className = "fortune";
       adviceText.className = "advice";
@@ -228,7 +229,11 @@
         resultContent.replaceChildren(resultHint);
 
         const revealDelay = prefersReducedMotion.matches ? 0 : 1400;
-        window.setTimeout(() => {
+        if (revealTimerId !== null) {
+          window.clearTimeout(revealTimerId);
+        }
+
+        revealTimerId = window.setTimeout(() => {
           result.classList.remove("is-animating");
           resultMessage.textContent = `結果：${pick.title}。${pick.advice}`;
           fortuneText.textContent = pick.title;
@@ -237,7 +242,14 @@
           fortuneText.focus({ preventScroll: true });
           drawButton.disabled = false;
           isAnimating = false;
+          revealTimerId = null;
         }, revealDelay);
+      });
+
+      window.addEventListener("beforeunload", () => {
+        if (revealTimerId !== null) {
+          window.clearTimeout(revealTimerId);
+        }
       });
     </script>
   </body>
