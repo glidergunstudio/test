@@ -59,15 +59,87 @@
         outline-offset: 3px;
       }
 
+      button:disabled {
+        opacity: 0.65;
+        cursor: not-allowed;
+      }
+
       .result {
         margin-top: 18px;
-        min-height: 88px;
+        min-height: 170px;
         border-radius: 12px;
         background: #fff8e6;
         padding: 14px;
         color: #333;
         display: grid;
         place-items: center;
+        align-content: center;
+      }
+
+      .omikuji-stage {
+        height: 88px;
+        display: none;
+        place-items: center;
+        margin-bottom: 8px;
+      }
+
+      .result.is-animating .omikuji-stage {
+        display: grid;
+      }
+
+      .omikuji-box {
+        width: 72px;
+        height: 72px;
+        border-radius: 12px;
+        background: linear-gradient(145deg, #da3f3f 0%, #b82424 100%);
+        position: relative;
+      }
+
+      .result.is-animating .omikuji-box {
+        animation: shake 0.42s ease-in-out 3;
+      }
+
+      .omikuji-stick {
+        position: absolute;
+        left: 50%;
+        top: 18px;
+        width: 6px;
+        height: 50px;
+        border-radius: 4px;
+        background: #f3e6c7;
+        transform: translate(-50%, 0);
+      }
+
+      .result.is-animating .omikuji-stick {
+        animation: draw-stick 1.26s ease-out forwards;
+      }
+
+      .hint {
+        margin: 0;
+      }
+
+      @keyframes shake {
+        0%,
+        100% {
+          transform: rotate(0deg);
+        }
+        25% {
+          transform: rotate(-8deg);
+        }
+        75% {
+          transform: rotate(8deg);
+        }
+      }
+
+      @keyframes draw-stick {
+        0%,
+        25% {
+          transform: translate(-50%, 0);
+        }
+        70%,
+        100% {
+          transform: translate(-50%, -40px);
+        }
       }
 
       .fortune {
@@ -88,7 +160,12 @@
       <h1>今日のおみくじ</h1>
       <button id="drawButton" type="button">おみくじを引く</button>
       <section class="result" id="result" aria-live="polite">
-        <p>ボタンを押して運勢を占ってみましょう。</p>
+        <div class="omikuji-stage" aria-hidden="true">
+          <div class="omikuji-box">
+            <span class="omikuji-stick"></span>
+          </div>
+        </div>
+        <p class="hint" id="resultMessage">ボタンを押して運勢を占ってみましょう。</p>
       </section>
     </main>
 
@@ -102,17 +179,37 @@
 
       const drawButton = document.getElementById("drawButton");
       const result = document.getElementById("result");
+      const resultMessage = document.getElementById("resultMessage");
       const fortuneText = document.createElement("p");
       const adviceText = document.createElement("p");
+      let isAnimating = false;
 
       fortuneText.className = "fortune";
       adviceText.className = "advice";
 
       drawButton.addEventListener("click", () => {
+        if (isAnimating) {
+          return;
+        }
+
+        isAnimating = true;
+        drawButton.disabled = true;
+
         const pick = fortunes[Math.floor(Math.random() * fortunes.length)];
-        fortuneText.textContent = pick.title;
-        adviceText.textContent = `${pick.title}：${pick.advice}`;
-        result.replaceChildren(fortuneText, adviceText);
+        result.classList.add("is-animating");
+        resultMessage.textContent = "おみくじを振っています…";
+        fortuneText.remove();
+        adviceText.remove();
+
+        window.setTimeout(() => {
+          result.classList.remove("is-animating");
+          resultMessage.textContent = "";
+          fortuneText.textContent = pick.title;
+          adviceText.textContent = `${pick.title}：${pick.advice}`;
+          result.append(fortuneText, adviceText);
+          drawButton.disabled = false;
+          isAnimating = false;
+        }, 1400);
       });
     </script>
   </body>
