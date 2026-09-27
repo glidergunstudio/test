@@ -171,7 +171,7 @@
     <main class="card">
       <h1>今日のおみくじ</h1>
       <button id="drawButton" type="button">おみくじを引く</button>
-      <section class="result" id="result">
+      <section class="result" id="result" tabindex="-1">
         <div class="omikuji-stage" aria-hidden="true">
           <div class="omikuji-box">
             <span class="omikuji-stick"></span>
@@ -225,6 +225,7 @@
           fortuneText.textContent = pick.title;
           adviceText.textContent = `${pick.title}：${pick.advice}`;
           result.append(fortuneText, adviceText);
+          result.focus({ preventScroll: true });
           drawButton.disabled = false;
           isAnimating = false;
         }, 1400);
