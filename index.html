@@ -214,6 +214,12 @@
       let isAnimating = false;
       let revealTimerId = null;
       let announceToggle = false;
+      const clearRevealTimer = () => {
+        if (revealTimerId !== null) {
+          window.clearTimeout(revealTimerId);
+          revealTimerId = null;
+        }
+      };
 
       fortuneText.className = "fortune";
       adviceText.className = "advice";
@@ -233,9 +239,7 @@
         resultContent.replaceChildren(resultHint);
 
         const revealDelay = prefersReducedMotion.matches ? 0 : 1400;
-        if (revealTimerId !== null) {
-          window.clearTimeout(revealTimerId);
-        }
+        clearRevealTimer();
 
         revealTimerId = window.setTimeout(() => {
           result.classList.remove("is-animating");
@@ -250,6 +254,8 @@
           revealTimerId = null;
         }, revealDelay);
       });
+
+      window.addEventListener("pagehide", clearRevealTimer);
 
     </script>
   </body>
