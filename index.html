@@ -212,7 +212,6 @@
 
       fortuneText.className = "fortune";
       adviceText.className = "advice";
-      fortuneText.setAttribute("tabindex", "-1");
 
       drawButton.addEventListener("click", () => {
         if (isAnimating) {
@@ -220,7 +219,6 @@
         }
 
         isAnimating = true;
-        const shouldMoveFocusToResult = document.activeElement === drawButton;
         drawButton.disabled = true;
 
         const pick = fortunes[Math.floor(Math.random() * fortunes.length)];
@@ -240,9 +238,6 @@
           fortuneText.textContent = pick.title;
           adviceText.textContent = `${pick.title}：${pick.advice}`;
           resultContent.replaceChildren(fortuneText, adviceText);
-          if (shouldMoveFocusToResult) {
-            fortuneText.focus({ preventScroll: true });
-          }
           drawButton.disabled = false;
           isAnimating = false;
           revealTimerId = null;
